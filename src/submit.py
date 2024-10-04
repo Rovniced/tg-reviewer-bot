@@ -11,7 +11,7 @@ from telegram.ext import (
 from telegram.helpers import escape_markdown
 
 from src.config import ReviewConfig
-import src.database.ban_user as Banned_user
+import src.database.ban as Banned_user
 import src.database.submitter as Submitter
 from src.review_utils import reply_review_message
 from utils import send_submission

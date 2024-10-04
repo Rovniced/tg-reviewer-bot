@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy import select
 
-from src.database import SessionFactory, SubmitterModel
+from src.database import StatisticSessionFactory, SubmitterModel
 
 
 async def count_modify(user_id: int, column_name: str, num: Optional[int] = 1) -> SubmitterModel:
@@ -15,7 +15,7 @@ async def count_modify(user_id: int, column_name: str, num: Optional[int] = 1) -
     Returns:
         SubmitterModel: The updated Submitter object.
     """
-    async with SessionFactory() as session:
+    async with StatisticSessionFactory() as session:
         async with session.begin():
             user_data = await session.execute(select(SubmitterModel).filter_by(user_id=user_id))
             if not (user_data := user_data.scalar_one_or_none()):
@@ -33,6 +33,6 @@ async def get_submitter(user_id: int) -> SubmitterModel | None:
     Returns:
         SubmitterModel: The retrieved Submitter object.
     """
-    async with SessionFactory() as session:
+    async with StatisticSessionFactory() as session:
         user_data = await session.execute(select(SubmitterModel).filter_by(user_id=user_id))
         return user_data.scalar_one_or_none()

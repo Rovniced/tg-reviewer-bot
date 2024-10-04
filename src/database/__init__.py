@@ -44,12 +44,36 @@ class BannedUserModel(Base):
     banned_by: Mapped[int] = mapped_column(Integer, comment='封禁操作人ID')
 
 
-db_path = Config.DATABASES_DIR / 'system.db'
-if not db_path.exists():
-    os.makedirs(Config.DATABASES_DIR, exist_ok=True)
-    sync_engine = create_engine(f"sqlite:///{db_path}")
-    with sync_engine.begin() as connection:
-        Base.metadata.create_all(sync_engine)
-        connection.execute(text('PRAGMA journal_mode = WAL'))  # 启用 WAL
-ENGINE = create_async_engine(f'sqlite+aiosqlite:///{db_path}', echo=Config.SQLALCHEMY_LOG)
-SessionFactory = async_sessionmaker(bind=ENGINE, expire_on_commit=False)
+def initialize_database(db_name, base):
+    db_path = Config.DATABASES_DIR / db_name
+    if not db_path.exists():
+        os.makedirs(Config.DATABASES_DIR, exist_ok=True)
+        sync_engine = create_engine(f"sqlite:///{db_path}")
+        with sync_engine.begin() as connection:
+            base.metadata.create_all(sync_engine)
+            connection.execute(text('PRAGMA journal_mode = WAL'))  # 启用 WAL
+    
+    return create_async_engine(f'sqlite+aiosqlite:///{db_path}', echo=Config.SQLALCHEMY_LOG)
+
+
+class ManuscriptBase(AsyncAttrs, DeclarativeBase):
+    pass
+
+
+class ManuscriptModel(ManuscriptBase):
+    # 稿件数据
+    __tablename__ = "manuscript"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True, comment='稿件id')
+    approve: Mapped[str] = mapped_column(String, nullable=True, comment='投票通过的')
+    reject: Mapped[str] = mapped_column(String, nullable=True, comment='投票拒绝的')
+    submitter_id: Mapped[int] = mapped_column(Integer, comment='投稿者id')
+    reject_reason: Mapped[str] = mapped_column(String, nullable=True, comment='拒绝原因')
+    submitter_message_id: Mapped[int] = mapped_column(Integer, comment='投稿原始消息id')
+    
+    
+# 统计数据库
+statistic_engine = initialize_database('statistic.db', Base)
+StatisticSessionFactory = async_sessionmaker(bind=statistic_engine, expire_on_commit=False)
+# 稿件数据库
+manuscript_engine = initialize_database('manuscript.db', ManuscriptBase)
+ManuscriptSessionFactory = async_sessionmaker(bind=manuscript_engine, expire_on_commit=False)

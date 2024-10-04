@@ -164,3 +164,4 @@ cython_debug/
 *.toml
 !config.production.toml
 *.db
+/database/

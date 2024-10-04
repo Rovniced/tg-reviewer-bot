@@ -9,7 +9,9 @@ from telegram.ext import (
     filters,
 )
 
-from src.ban import ban_user, list_banned_users, unban_user
+from src.bot.command.ban import ban_user, list_banned_users, unban_user
+from src.bot.callback.submit import confirm_submission
+from src.bot.message import reply_option
 from src.config import Config, ReviewConfig
 from src.review import (
     approve_submission,
@@ -26,7 +28,7 @@ from src.review_utils import (
     retract_approved_submission,
     send_custom_rejection_reason,
 )
-from src.stats import reviewer_stats, submitter_stats
+from src.bot.command.stats import reviewer_stats, submitter_stats
 from src.utils import PrefixFilter, get_username
 
 logging.basicConfig(
@@ -49,25 +51,22 @@ if __name__ == "__main__":
         .write_timeout(60)
         .build()
     )
-
+    
+    # 按钮回调
+    
     if ReviewConfig.SINGLE_MODE:
-        from src.submit_single import confirm_submit_handler, submission_handler
-
-        application.add_handler(confirm_submit_handler)
-    else:
-        from src.submit import submission_handler
-
-    application.add_handler(submission_handler)
+        application.add_handler(CallbackQueryHandler(confirm_submission,pattern=f"cancel|anonymous|realname",))
+        
+    # 审核按钮回调
+    application.add_handler(CallbackQueryHandler(approve_submission, pattern=f"^({ReviewChoice.SFW}|{ReviewChoice.NSFW})"))
+    application.add_handler(CallbackQueryHandler(reject_submission,pattern=f"^({ReviewChoice.REJECT}|{ReviewChoice.REJECT_DUPLICATE})", ))
+    
+    # 文本回调 投稿
+    application.add_handler(MessageHandler(filters.ChatType.PRIVATE & ~filters.COMMAND, reply_option))
+    
+    # 命令回调
     application.add_handlers(
         [
-            CallbackQueryHandler(
-                approve_submission,
-                pattern=f"^({ReviewChoice.SFW}|{ReviewChoice.NSFW})",
-            ),
-            CallbackQueryHandler(
-                reject_submission,
-                pattern=f"^({ReviewChoice.REJECT}|{ReviewChoice.REJECT_DUPLICATE})",
-            ),
             CallbackQueryHandler(query_decision, pattern=f"^{ReviewChoice.QUERY}"),
             CallbackQueryHandler(
                 withdraw_decision, pattern=f"^{ReviewChoice.WITHDRAW}"
