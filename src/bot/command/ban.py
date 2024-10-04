@@ -10,24 +10,14 @@ from src.utils import get_banned_user_info, get_name_from_uid
 
 async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
-        await update.message.reply_text("请提供用户ID和原因")
-        return
+        return await update.message.reply_text("请提供用户ID和原因")
     user, result = context.args[0], context.args[1:]
     if not user.isdigit():
-        await update.message.reply_text(
-                f"ID *{escape_markdown(user, version=2, )}* 无效",
-                parse_mode=ParseMode.MARKDOWN_V2,
-        )
-        return
+        return await update.message.reply_text(f"ID *{escape_markdown(user, version=2, )}* 无效", parse_mode=ParseMode.MARKDOWN_V2)
     if Banned_user.is_banned(user):
-        await update.message.reply_text(
-                f"{user} 先前已被屏蔽\n"
-                + await get_banned_user_info(
-                        context, (await Banned_user.get_banned_user(user))
-                ),
-                parse_mode=ParseMode.MARKDOWN_V2,
-        )
-        return
+        return await update.message.reply_text(f"{user} 已被屏蔽\n" +
+                                               await get_banned_user_info(context, (await Banned_user.get_banned_user(user))),
+                                               parse_mode=ParseMode.MARKDOWN_V2)
     
     username, fullname = await get_name_from_uid(context, user)
     user_data = BannedUserModel(

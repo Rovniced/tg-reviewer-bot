@@ -202,7 +202,13 @@ async def send_result_to_submitter(
         pass
 
 
-async def get_name_from_uid(context, user_id):
+async def get_name_from_uid(context: ContextTypes.DEFAULT_TYPE, user_id: int) -> tuple[str, str]:
+    """
+    Get username and full name from user_id
+    :param context: context
+    :param user_id: user_id
+    :return: username, fullname
+    """
     try:
         user = await context.bot.get_chat(user_id)
         return user.username, user.full_name
