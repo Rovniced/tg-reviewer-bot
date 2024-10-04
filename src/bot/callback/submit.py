@@ -9,6 +9,12 @@ from src.utils import MEDIA_GROUPS, send_submission
 import src.database.submitter as Submitter
 
 
+async def cancel_submission(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.edit_message_text(text="投稿已取消")
+    await query.answer()
+
+
 async def confirm_submission(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     # CallbackQueries need to be answered, even if no notification to the user is needed
@@ -20,9 +26,7 @@ async def confirm_submission(update: Update, context: ContextTypes.DEFAULT_TYPE)
     confirm_message = update.effective_message
     origin_message = confirm_message.reply_to_message
 
-    if query.data.startswith("cancel"):
-        await query.edit_message_text(text="投稿已取消")
-    elif query.data.startswith(("anonymous", "realname")):
+    if query.data.startswith(("anonymous", "realname")):
         text = (
             origin_message.text_markdown_v2_urled
             or origin_message.caption_markdown_v2_urled

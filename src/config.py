@@ -38,7 +38,6 @@ class ReviewConfig(BaseConfig):
     REJECTED_CHANNEL: int = 0  # 拒稿频道
     PUBLISH_CHANNEL: int = 0  # 发布频道
     REVIEWER_GROUP: int = 0  # 审核群组
-    SINGLE_MODE: bool = True  # 合并为单条投稿
     REJECTION_REASON: str = "内容不够有趣:内容不适当:重复投稿"  # 拒稿理由
     REJECT_NUMBER_REQUIRED: int = 2  # 拒稿所需的最小审核人数
     APPROVE_NUMBER_REQUIRED: int = 2  # 通过所需的最小审核人数

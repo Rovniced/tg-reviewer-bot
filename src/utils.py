@@ -218,9 +218,7 @@ async def get_username() -> str:
     return BOT_USERNAME
 
 
-async def get_banned_user_info(
-        context: ContextTypes.DEFAULT_TYPE, user: BannedUserModel
-):
+async def get_banned_user_info(context: ContextTypes.DEFAULT_TYPE, user: BannedUserModel):
     banned_userinfo = escape_markdown(
             f"{user.user_fullname} ({f'@{user.user_name}, ' if user.user_name else ''}{user.user_id})",
             version=2,
