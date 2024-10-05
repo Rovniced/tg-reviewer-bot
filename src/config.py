@@ -11,7 +11,7 @@ class BaseConfig:
     """
     配置管理的基类。
     """
-
+    
     @classmethod
     def update_from_toml(cls, path: str, section: str = None):
         try:
@@ -34,7 +34,24 @@ class Config(BaseConfig):
     BOT_TOKEN: str = ""  # 机器人 Token
 
 
+class SubmitConfig(BaseConfig):
+    """
+    投稿配置
+    """
+    SUBMITTER_LIMIT: bool = False  # 投稿限制
+    SUBMITTER_LIMIT_BAN: bool = True  # 投稿限制封禁
+    SUBMITTER_LIMIT_MINUTE: int = 6  # 投稿限制频率/分钟 表示每分钟最多投6份稿件
+    SUBMITTER_LIMIT_DAY: int = 100  # 投稿限制频率/分钟 表示每天最多投100份稿件
+    
+    # 投稿类型
+    SUBMITTER_TYPE_LIMIT: bool = True  # 投稿类型限制
+    SUBMITTER_TYPE: list = ["TEXT", "PHOTO", "VIDEO", "DOCUMENT"]  # 允许的投稿类型 TEXT,PHOTO,VIDEO,STICKER,ANIMATION,DOCUMENT
+
+
 class ReviewConfig(BaseConfig):
+    """
+    审核配置
+    """
     REJECTED_CHANNEL: int = 0  # 拒稿频道
     PUBLISH_CHANNEL: int = 0  # 发布频道
     REVIEWER_GROUP: int = 0  # 审核群组
@@ -50,3 +67,4 @@ if os.path.exists(os.path.join(ROOT_PATH, 'config.toml')):
     _toml_file_path = os.path.join(ROOT_PATH, 'config.toml')
     Config.update_from_toml(_toml_file_path)
     ReviewConfig.update_from_toml(_toml_file_path, 'Review')
+    SubmitConfig.update_from_toml(_toml_file_path, 'Submit')

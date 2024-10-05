@@ -29,43 +29,25 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await Banned_user.ban_user(user_data)
     if user_data.banned_date:
-        await update.message.reply_text(
-                await get_banned_user_info(context, await Banned_user.get_banned_user(user))
-                + escape_markdown(
-                        f"\n\n#BAN_{user} #OPERATOR_{update.effective_user.id}",
-                        version=2,
-                ),
-                parse_mode=ParseMode.MARKDOWN_V2,
-        )
+        await update.message.reply_text(await get_banned_user_info(context, await Banned_user.get_banned_user(user)) +
+                                        escape_markdown(f"\n\n#BAN_{user} #OPERATOR_{update.effective_user.id}", version=2, ),
+                                        parse_mode=ParseMode.MARKDOWN_V2)
     else:
-        await update.message.reply_text(
-                f"*{user}* 屏蔽失败",
-                parse_mode=ParseMode.MARKDOWN_V2,
-        )
+        await update.message.reply_text(f"*{user}* 屏蔽失败", parse_mode=ParseMode.MARKDOWN_V2)
 
 
 async def unban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
-        await update.message.reply_text(
+        return await update.message.reply_text(
                 "请提供用户ID",
         )
-        return
     user = context.args[0]
-    await Banned_user.unban_user(user)
-    if Banned_user.is_banned(user):
+    if await Banned_user.unban_user(user):
         await update.message.reply_text(
-                f"*{user}* 解除屏蔽失败",
-                parse_mode=ParseMode.MARKDOWN_V2,
-        )
+                f"*{user}* " + escape_markdown(f"已解除屏蔽\n\n#UNBAN_{user} #OPERATOR_{update.effective_user.id}", version=2, ),
+                parse_mode=ParseMode.MARKDOWN_V2)
     else:
-        await update.message.reply_text(
-                f"*{user}* "
-                + escape_markdown(
-                        f"已解除屏蔽\n\n#UNBAN_{user} #OPERATOR_{update.effective_user.id}",
-                        version=2,
-                ),
-                parse_mode=ParseMode.MARKDOWN_V2,
-        )
+        await update.message.reply_text(f"*{user}* 解除屏蔽失败", parse_mode=ParseMode.MARKDOWN_V2)
 
 
 async def list_banned_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -73,7 +55,4 @@ async def list_banned_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
     users_string = "屏蔽用户列表:\n" if users else "无屏蔽用户\n"
     for user in users:
         users_string += f"\- {await get_banned_user_info(context, user)}\n"
-    await update.message.reply_text(
-            users_string,
-            parse_mode=ParseMode.MARKDOWN_V2,
-    )
+    await update.message.reply_text(users_string, parse_mode=ParseMode.MARKDOWN_V2)

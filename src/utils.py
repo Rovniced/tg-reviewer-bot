@@ -14,8 +14,6 @@ from telegram.helpers import escape_markdown
 from src.config import Config
 from src.database import BannedUserModel
 
-MEDIA_GROUPS = {}
-
 
 class PrefixFilter(MessageFilter):
     prefix = "/append"

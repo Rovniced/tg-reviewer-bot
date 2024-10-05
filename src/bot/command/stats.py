@@ -30,14 +30,9 @@ async def submitter_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def reviewer_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if context.args:
-        reviewer_id = context.args[0]
-    else:
-        reviewer_id = update.effective_user.id
-    reviewer_info = await Reviewer.get_reviewer(reviewer_id)
-    if not reviewer_info:
-        await update.message.reply_text("还没有审核过任何内容")
-        return
+    reviewer_id = context.args[0] if context.args else update.effective_user.id
+    if not (reviewer_info := await Reviewer.get_reviewer(reviewer_id)):
+        return await update.message.reply_text("还没有审核过任何内容")
     reply_string = "*\-\-基础信息\-\-*\n" + escape_markdown(
             dedent(
                     f"""
